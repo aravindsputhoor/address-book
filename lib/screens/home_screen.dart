@@ -1,3 +1,4 @@
+import 'package:AddressBook/screens/add_address_screen.dart';
 import 'package:AddressBook/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +21,9 @@ class HomeScreen extends StatelessWidget {
         child: Icon(
           Icons.add,
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(AddAddressScreen.routeName);
+        },
       ),
     );
   }

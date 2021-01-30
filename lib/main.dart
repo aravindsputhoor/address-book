@@ -1,5 +1,7 @@
+import 'package:AddressBook/screens/add_address_screen.dart';
 import 'package:AddressBook/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(MyApp());
@@ -8,16 +10,21 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Address Book',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        accentColor: Colors.orange,
-        fontFamily: 'Semibold',
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return MultiProvider(
+      providers: [],
+      child: MaterialApp(
+        title: 'Address Book',
+        theme: ThemeData(
+          primarySwatch: Colors.purple,
+          accentColor: Colors.orange,
+          fontFamily: 'Semibold',
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: HomeScreen(),
+        routes: {
+          AddAddressScreen.routeName: (ctx) => AddAddressScreen(),
+        },
       ),
-      home: HomeScreen(),
-      routes: {},
     );
   }
 }
