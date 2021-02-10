@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:provider/provider.dart';
 import 'package:AddressBook/providers/address.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
 
 class AddAddressScreen extends StatefulWidget {
   static const routeName = '/addaddress';
@@ -17,6 +17,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final _addressFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
   final _form = GlobalKey<FormState>();
+
+  var _isLoading = false;
 
   var _addressdata = AddressData(
     name: '',
@@ -40,25 +42,33 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     }
     _form.currentState.save();
 
+    setState(() {
+      _isLoading = true;
+    });
+
     final ResposeData response =
         await Provider.of<Address>(context, listen: false)
             .addAddress(_addressdata);
     if (response.status == '1') {
       print(response.msg);
-      // Navigator.pop(context);
-      Fluttertoast.showToast(
-          msg: "This is Center Short Toast",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(response.msg),
+      ));
     } else if (response.status == '2') {
       print(response.msg);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(response.msg),
+      ));
     } else {
       print(response.msg);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Server Error..! Try Again"),
+      ));
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -72,96 +82,100 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _form,
-          child: ListView(
-            children: [
-              TextFormField(
-                focusNode: _nameFocusNode,
-                decoration: InputDecoration(labelText: 'Name'),
-                onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_addressFocusNode);
-                },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please Enter Name';
-                  } else {
-                    return null;
-                  }
-                },
-                onSaved: (value) {
-                  _addressdata = AddressData(
-                    name: value,
-                    address: _addressdata.address,
-                    email: _addressdata.email,
-                  );
-                },
-              ),
-              TextFormField(
-                focusNode: _addressFocusNode,
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_emailFocusNode);
-                },
-                decoration: InputDecoration(labelText: 'Address'),
-                maxLines: 3,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please Enter Address';
-                  } else {
-                    return null;
-                  }
-                },
-                onSaved: (value) {
-                  _addressdata = AddressData(
-                    name: _addressdata.name,
-                    address: value,
-                    email: _addressdata.email,
-                  );
-                },
-              ),
-              TextFormField(
-                focusNode: _emailFocusNode,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please Enter Email Address';
-                  }
-                  if (!EmailValidator.validate(value)) {
-                    return 'Please enter a valid email';
-                  } else {
-                    return null;
-                  }
-                },
-                onSaved: (value) {
-                  _addressdata = AddressData(
-                    name: _addressdata.name,
-                    address: _addressdata.address,
-                    email: value,
-                  );
-                },
-              ),
-              Container(
-                height: 30,
-              ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _form,
+                child: ListView(
                   children: [
-                    RaisedButton(
-                      child: Text('Submit'),
-                      onPressed: _saveForm,
+                    TextFormField(
+                      focusNode: _nameFocusNode,
+                      decoration: InputDecoration(labelText: 'Name'),
+                      onFieldSubmitted: (_) {
+                        FocusScope.of(context).requestFocus(_addressFocusNode);
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please Enter Name';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onSaved: (value) {
+                        _addressdata = AddressData(
+                          name: value,
+                          address: _addressdata.address,
+                          email: _addressdata.email,
+                        );
+                      },
+                    ),
+                    TextFormField(
+                      focusNode: _addressFocusNode,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) {
+                        FocusScope.of(context).requestFocus(_emailFocusNode);
+                      },
+                      decoration: InputDecoration(labelText: 'Address'),
+                      maxLines: 3,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please Enter Address';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onSaved: (value) {
+                        _addressdata = AddressData(
+                          name: _addressdata.name,
+                          address: value,
+                          email: _addressdata.email,
+                        );
+                      },
+                    ),
+                    TextFormField(
+                      focusNode: _emailFocusNode,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(labelText: 'Email'),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please Enter Email Address';
+                        }
+                        if (!EmailValidator.validate(value)) {
+                          return 'Please enter a valid email';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onSaved: (value) {
+                        _addressdata = AddressData(
+                          name: _addressdata.name,
+                          address: _addressdata.address,
+                          email: value,
+                        );
+                      },
+                    ),
+                    Container(
+                      height: 30,
+                    ),
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          RaisedButton(
+                            child: Text('Submit'),
+                            onPressed: _saveForm,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

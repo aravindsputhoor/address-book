@@ -16,6 +16,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+      body: Container(),
       drawer: AppDrawer(),
       floatingActionButton: FloatingActionButton(
         child: Icon(
