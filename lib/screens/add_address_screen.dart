@@ -1,5 +1,9 @@
+import 'package:AddressBook/models/respose.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:provider/provider.dart';
+import 'package:AddressBook/providers/address.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AddAddressScreen extends StatefulWidget {
   static const routeName = '/addaddress';
@@ -14,12 +18,47 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final _emailFocusNode = FocusNode();
   final _form = GlobalKey<FormState>();
 
-  void _saveForm() {
+  var _addressdata = AddressData(
+    name: '',
+    address: '',
+    email: '',
+  );
+
+  @override
+  void dispose() {
+    _nameFocusNode.dispose();
+    _addressFocusNode.dispose();
+    _emailFocusNode.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveForm() async {
     final isValid = _form.currentState.validate();
+
     if (!isValid) {
       return;
     }
     _form.currentState.save();
+
+    final ResposeData response =
+        await Provider.of<Address>(context, listen: false)
+            .addAddress(_addressdata);
+    if (response.status == '1') {
+      print(response.msg);
+      // Navigator.pop(context);
+      Fluttertoast.showToast(
+          msg: "This is Center Short Toast",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else if (response.status == '2') {
+      print(response.msg);
+    } else {
+      print(response.msg);
+    }
   }
 
   @override
@@ -52,6 +91,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     return null;
                   }
                 },
+                onSaved: (value) {
+                  _addressdata = AddressData(
+                    name: value,
+                    address: _addressdata.address,
+                    email: _addressdata.email,
+                  );
+                },
               ),
               TextFormField(
                 focusNode: _addressFocusNode,
@@ -68,6 +114,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     return null;
                   }
                 },
+                onSaved: (value) {
+                  _addressdata = AddressData(
+                    name: _addressdata.name,
+                    address: value,
+                    email: _addressdata.email,
+                  );
+                },
               ),
               TextFormField(
                 focusNode: _emailFocusNode,
@@ -83,13 +136,27 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     return null;
                   }
                 },
+                onSaved: (value) {
+                  _addressdata = AddressData(
+                    name: _addressdata.name,
+                    address: _addressdata.address,
+                    email: value,
+                  );
+                },
               ),
               Container(
                 height: 30,
               ),
-              RaisedButton(
-                child: Text('Submit'),
-                onPressed: _saveForm,
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    RaisedButton(
+                      child: Text('Submit'),
+                      onPressed: _saveForm,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

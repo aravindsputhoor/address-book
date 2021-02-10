@@ -1,3 +1,4 @@
+import 'package:AddressBook/providers/address.dart';
 import 'package:AddressBook/screens/add_address_screen.dart';
 import 'package:AddressBook/screens/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [],
+      providers: [
+        ChangeNotifierProvider(
+          create: (ctx) => Address(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Address Book',
         theme: ThemeData(
